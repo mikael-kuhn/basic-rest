@@ -1,2 +1,3 @@
 # basic-rest
-Blog about REST
+
+Don't use this code for anything else than experiments, it is for a blog - not production code.
