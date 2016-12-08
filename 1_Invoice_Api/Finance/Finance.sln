@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.0.0
 MinimumVisualStudioVersion = 10.0.0.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FinanceApi", "FinanceApi/FinanceApi.xproj", "{144B769B-CAFC-4D3F-BE02-E1FC262F250E}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FinanceApi", "src/FinanceApi/FinanceApi.xproj", "{144B769B-CAFC-4D3F-BE02-E1FC262F250E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FinanceApiTest", "FinanceApiTest\FinanceApiTest.xproj", "{8E77C1D1-7C05-44F1-A849-4D41C94AABA7}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FinanceApiTest", "test/FinanceApiTest\FinanceApiTest.xproj", "{8E77C1D1-7C05-44F1-A849-4D41C94AABA7}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Finance.Domain", "Finance.Domain\Finance.Domain.xproj", "{9909D179-E6F0-47DB-B242-6952C066DD1E}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Finance.Domain", "src/Finance.Domain\Finance.Domain.xproj", "{9909D179-E6F0-47DB-B242-6952C066DD1E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Finance.DomainTest", "Finance.DomainTest\Finance.DomainTest.xproj", "{2DED0EC5-8FE5-49AA-BF16-06E56F2FE015}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Finance.DomainTest", "test/Finance.DomainTest\Finance.DomainTest.xproj", "{2DED0EC5-8FE5-49AA-BF16-06E56F2FE015}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5A34FD3C-C780-4C57-B42D-034E02A8135D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +38,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8E77C1D1-7C05-44F1-A849-4D41C94AABA7} = {5A34FD3C-C780-4C57-B42D-034E02A8135D}
+		{2DED0EC5-8FE5-49AA-BF16-06E56F2FE015} = {5A34FD3C-C780-4C57-B42D-034E02A8135D}
 	EndGlobalSection
 EndGlobal
