@@ -13,20 +13,20 @@ namespace FinanceApiTest.Controllers
     using Finance.Domain.Repositories;
     using FinanceApi.Models;
 
-    public sealed class InvoiceControllerTest
+    public sealed class InvoicesControllerTest
     {
-        private readonly InvoiceController testSubject;
+        private readonly InvoicesController testSubject;
         private readonly Mock<IRepository<Domain.Invoice>> invoiceRepositoryMock;
         private readonly Mock<IModelDomainMapper<GetInvoice, Domain.Invoice>> getInvoiceMapperMock;
         private readonly Mock<IModelDomainMapper<UpdateInvoice, Domain.Invoice>> updateInvoiceMapperMock;
 
-        public InvoiceControllerTest()
+        public InvoicesControllerTest()
         {
             invoiceRepositoryMock = new Mock<IRepository<Domain.Invoice>>();
             getInvoiceMapperMock = new Mock<IModelDomainMapper<GetInvoice, Domain.Invoice>>();
             updateInvoiceMapperMock = new Mock<IModelDomainMapper<UpdateInvoice, Domain.Invoice>>();
 
-            testSubject = new InvoiceController(invoiceRepositoryMock.Object,
+            testSubject = new InvoicesController(invoiceRepositoryMock.Object,
                 getInvoiceMapperMock.Object,
                 updateInvoiceMapperMock.Object);
         }

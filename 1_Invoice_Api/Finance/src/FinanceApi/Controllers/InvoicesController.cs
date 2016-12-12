@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceApi.Controllers
 {
@@ -9,14 +7,14 @@ namespace FinanceApi.Controllers
     using Domain = Finance.Domain.Domain;
     using Models;
 
-    [Route("invoice")]
-    public sealed class InvoiceController : Controller
+    [Route("invoices")]
+    public sealed class InvoicesController : Controller
     {
         private readonly IRepository<Domain.Invoice> invoiceRepository;
         private readonly IModelDomainMapper<GetInvoice, Domain.Invoice> getInvoiceMapper;
         private readonly IModelDomainMapper<UpdateInvoice, Domain.Invoice> updateInvoiceMapper;
 
-        public InvoiceController(IRepository<Domain.Invoice> invoiceRepository,
+        public InvoicesController(IRepository<Domain.Invoice> invoiceRepository,
             IModelDomainMapper<GetInvoice, Domain.Invoice> getInvoiceMapper,
             IModelDomainMapper<UpdateInvoice, Domain.Invoice> updateInvoiceMapper)
         {
@@ -77,34 +75,6 @@ namespace FinanceApi.Controllers
             }
 
             invoiceRepository.Update(updateInvoiceMapper.ToDomain(updateInvoice, id));
-
-            return NoContent();
-        }
-
-        [HttpPatch("{id}")]
-        public IActionResult Patch(string id, [FromBody] JsonPatchDocument<UpdateInvoice> patchDocument)
-        {
-            if (patchDocument == null)
-            {
-                return BadRequest();
-            }
-
-            var invoice = invoiceRepository.Get(id);
-            if (invoice == null)
-            {
-                return NotFound();
-            }
-
-            var updateInvoice = updateInvoiceMapper.ToModel(invoice);
-            patchDocument.ApplyTo(updateInvoice, ModelState);
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var updatedDomainInvoice = updateInvoiceMapper.ToDomain(updateInvoice, id);
-            invoiceRepository.Update(updatedDomainInvoice);
 
             return NoContent();
         }

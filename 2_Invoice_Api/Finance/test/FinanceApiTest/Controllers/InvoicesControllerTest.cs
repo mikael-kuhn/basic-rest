@@ -1,8 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
+using FinanceApi;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Routing;
 using Moq;
 using Newtonsoft.Json.Serialization;
 using Xunit;
@@ -23,23 +31,26 @@ namespace FinanceApiTest.Controllers
         public string UnknownProperty { get; set; }
     }
 
-    public sealed class InvoiceControllerTest
+    public sealed class InvoicesControllerTest
     {
-        private readonly InvoiceController testSubject;
+        private readonly InvoicesController testSubject;
         private readonly Mock<IRepository<Domain.Invoice>> invoiceRepositoryMock;
         private readonly Mock<IModelDomainMapper<GetInvoice, Domain.Invoice>> getInvoiceMapperMock;
         private readonly Mock<IModelDomainMapper<UpdateInvoice, Domain.Invoice>> updateInvoiceMapperMock;
         private const string Id = "1";
 
-        public InvoiceControllerTest()
+        public InvoicesControllerTest()
         {
             invoiceRepositoryMock = new Mock<IRepository<Domain.Invoice>>();
             getInvoiceMapperMock = new Mock<IModelDomainMapper<GetInvoice, Domain.Invoice>>();
             updateInvoiceMapperMock = new Mock<IModelDomainMapper<UpdateInvoice, Domain.Invoice>>();
 
-            testSubject = new InvoiceController(invoiceRepositoryMock.Object,
+            testSubject = new InvoicesController(invoiceRepositoryMock.Object,
                 getInvoiceMapperMock.Object,
                 updateInvoiceMapperMock.Object);
+
+            testSubject.ControllerContext = new ControllerContext(new ActionContext(new DefaultHttpContext(),
+                new RouteData(), new ControllerActionDescriptor()));
         }
 
         [Fact]
@@ -226,6 +237,76 @@ namespace FinanceApiTest.Controllers
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(response);
+        }
+
+        [Fact]
+        public void Options_should_return_NoContent()
+        {
+            // Act
+            var response = testSubject.Options();
+
+            // Assert
+            Assert.IsType<NoContentResult>(response);
+        }
+
+        [Fact]
+        public void Options_should_return_allow_header()
+        {
+            // Act
+            testSubject.Options();
+
+            // Assert
+            Assert.True(testSubject.HttpContext.Response.Headers.ContainsKey("Allow"));
+        }
+
+        [Fact]
+        public void Options_should_return_allow_POST_OPTIONS()
+        {
+            // Act
+            testSubject.Options();
+
+            // Act
+            var methodsAllowed = testSubject.HttpContext.Response.Headers["Allow"].FirstOrDefault().Split(',');
+
+            // Assert
+            Assert.True(methodsAllowed.Contains(HttpVerbs.Post));
+            Assert.True(methodsAllowed.Contains(HttpVerbs.Options));
+        }
+
+        [Fact]
+        public void OptionsForInvoice_should_return_GET_PUT_OPTIONS_if_invoice_exists()
+        {
+            // Act
+            invoiceRepositoryMock.Setup(r => r.Exists(Id)).Returns(true);
+
+            // Act
+            testSubject.OptionsForInvoice(Id);
+
+            // Assert
+            var methodsAllowed = testSubject.HttpContext.Response.Headers["Allow"].FirstOrDefault().Split(',');
+            Assert.True(methodsAllowed.Contains(HttpVerbs.Get));
+            Assert.True(methodsAllowed.Contains(HttpVerbs.Put));
+            Assert.True(methodsAllowed.Contains(HttpVerbs.Patch));
+            Assert.True(methodsAllowed.Contains(HttpVerbs.Options));
+            Assert.False(methodsAllowed.Contains(HttpVerbs.Post));
+        }
+
+        [Fact]
+        public void OptionsForInvoice_should_return_GET_PUT_if_invoice_does_not_exist()
+        {
+            // Arrange
+            invoiceRepositoryMock.Setup(r => r.Exists(Id)).Returns(false);
+
+            // Act
+            testSubject.OptionsForInvoice(Id);
+
+            // Assert
+            var methodsAllowed = testSubject.HttpContext.Response.Headers["Allow"].FirstOrDefault().Split(',');
+            Assert.True(methodsAllowed.Contains(HttpVerbs.Options));
+            Assert.True(methodsAllowed.Contains(HttpVerbs.Get));
+            Assert.False(methodsAllowed.Contains(HttpVerbs.Put));
+            Assert.False(methodsAllowed.Contains(HttpVerbs.Patch));
+            Assert.False(methodsAllowed.Contains(HttpVerbs.Post));
         }
     }
 }
