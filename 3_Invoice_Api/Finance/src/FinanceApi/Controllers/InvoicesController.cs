@@ -73,7 +73,7 @@ namespace FinanceApi.Controllers
             var createdInvoice = invoiceRepository.Create(updateInvoiceMapper.ToDomain(updateInvoice));
 
             var responseHeaders = Response.GetTypedHeaders();
-            responseHeaders.ETag = new EntityTagHeaderValue($"\"{createdInvoice.Version}\"");;
+            responseHeaders.ETag = new EntityTagHeaderValue($"\"{createdInvoice.Version}\"");
 
             return CreatedAtRoute("GetInvoice",
                 new { id = createdInvoice.Id },
@@ -107,7 +107,7 @@ namespace FinanceApi.Controllers
                 updateInvoice, id)).Value;
 
             var responseHeaders = Response.GetTypedHeaders();
-            responseHeaders.ETag = new EntityTagHeaderValue($"\"{newVersion}\"");;
+            responseHeaders.ETag = new EntityTagHeaderValue($"\"{newVersion}\"");
 
             return NoContent();
         }
@@ -153,7 +153,7 @@ namespace FinanceApi.Controllers
             var newVersion = invoiceRepository.Update(updatedDomainInvoice);
 
             var responseHeaders = Response.GetTypedHeaders();
-            responseHeaders.ETag = new EntityTagHeaderValue($"\"{newVersion}\"");;
+            responseHeaders.ETag = new EntityTagHeaderValue($"\"{newVersion}\"");
 
             return NoContent();
         }
