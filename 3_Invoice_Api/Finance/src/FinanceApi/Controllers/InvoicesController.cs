@@ -116,7 +116,7 @@ namespace FinanceApi.Controllers
 
             return requestHeaders.IfMatch != null &&
                    !requestHeaders.IfMatch.Any(ifm => ifm.Equals(EntityTagHeaderValue.Any))
-                   && requestHeaders.IfMatch.Contains(currentETag);
+                   && !requestHeaders.IfMatch.Contains(currentETag);
         }
 
         [HttpPatch("{id}")]
