@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-*",
+  "version": "1.0.3",
   "buildOptions": {
     "debugType": "portable"
   },
@@ -8,7 +8,7 @@
           "version": "1.0.1",
           "type": "platform"
       },
-      "FinanceApi": "1.0.0",
+    "FinanceApi": "1.0.3",
     "System.Runtime.Serialization.Primitives": "4.1.1",
     "xunit": "2.1.0",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",

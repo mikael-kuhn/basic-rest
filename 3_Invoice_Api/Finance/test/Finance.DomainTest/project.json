@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-*",
+  "version": "1.0.3",
   "buildOptions": {
     "debugType": "portable"
   },
@@ -11,8 +11,8 @@
       "System.Runtime.Serialization.Primitives": "4.1.1",
     "xunit": "2.1.0",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "Finance.Domain" : "1.0.0",
-    "moq": "4.6.38-alpha"
+      "Finance.Domain": "1.0.3",
+      "moq": "4.6.38-alpha"
   },
   "testRunner": "xunit",
     "frameworks": {

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
-using System.Reflection.Metadata;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -136,6 +133,11 @@ namespace FinanceApi.Controllers
                 return NotFound();
             }
 
+            if (IfMatchIsInvalid(invoice.Version))
+            {
+                return StatusCode((int) HttpStatusCode.PreconditionFailed);
+            }
+
             var updateInvoice = updateInvoiceMapper.ToModel(invoice);
             patchDocument.ApplyTo(updateInvoice, ModelState);
 
@@ -145,7 +147,10 @@ namespace FinanceApi.Controllers
             }
 
             var updatedDomainInvoice = updateInvoiceMapper.ToDomain(updateInvoice, id);
-            invoiceRepository.Update(updatedDomainInvoice);
+            var newVersion = invoiceRepository.Update(updatedDomainInvoice);
+
+            var responseHeaders = Response.GetTypedHeaders();
+            responseHeaders.ETag = new EntityTagHeaderValue($"\"{newVersion}\"");;
 
             return NoContent();
         }

@@ -192,6 +192,7 @@ namespace FinanceApiTest.Controllers
             // Arrange
             var invoice = new UpdateInvoiceBuilder().Build();
             invoiceRepositoryMock.Setup(r => r.Exists(It.IsAny<string>())).Returns(true);
+            invoiceRepositoryMock.Setup(r => r.Update(It.IsAny<Domain.Invoice>())).Returns(new Version("2"));
 
             // Act
             var response = testSubject.Put(Id, invoice);
@@ -206,8 +207,9 @@ namespace FinanceApiTest.Controllers
             // Arrange
             var invoice = new UpdateInvoiceBuilder().Build();
             invoiceRepositoryMock.Setup(r => r.Exists(It.IsAny<string>())).Returns(true);
+            invoiceRepositoryMock.Setup(r => r.Update(It.IsAny<Domain.Invoice>())).Returns(new Version("2"));
 
-            // Act
+                // Act
             testSubject.Put(Id, invoice);
 
             // Assert
@@ -221,13 +223,14 @@ namespace FinanceApiTest.Controllers
             // Arrange
             var invoice = new UpdateInvoiceBuilder().Build();
             invoiceRepositoryMock.Setup(r => r.Exists(It.IsAny<string>())).Returns(true);
+            invoiceRepositoryMock.Setup(r => r.Update(It.IsAny<Domain.Invoice>())).Returns(new Version("2"));
             testSubject.Request.Headers.Add(HeaderNames.IfMatch, $"\"unknown\"");
 
             // Act
             var response = testSubject.Put(Id, invoice);
 
             // Assert
-            Assert.IsType<NoContentResult>(response);
+            Assert.Equal((int)HttpStatusCode.PreconditionFailed, ((StatusCodeResult)response).StatusCode);
         }
 
         [Fact]
@@ -236,6 +239,7 @@ namespace FinanceApiTest.Controllers
             // Arrange
             var invoice = new UpdateInvoiceBuilder().Build();
             invoiceRepositoryMock.Setup(r => r.Exists(It.IsAny<string>())).Returns(true);
+            invoiceRepositoryMock.Setup(r => r.Update(It.IsAny<Domain.Invoice>())).Returns(new Version("2"));
             testSubject.Request.Headers.Add(HeaderNames.IfMatch, EntityTagHeaderValue.Any.Tag);
 
             // Act
@@ -296,6 +300,63 @@ namespace FinanceApiTest.Controllers
 
             // Assert
             Assert.IsType<NoContentResult>(response);
+        }
+
+        [Fact]
+        public void Patch_should_return_NoContent_When_Etag_Is_Wildcard()
+        {
+            // Arrange
+            var invoice = new InvoiceBuilder().Build();
+            invoiceRepositoryMock.Setup(r => r.Get(Id)).Returns(invoice);
+            invoiceRepositoryMock.Setup(r => r.Update(It.IsAny<Domain.Invoice>())).Returns(new Version("2"));
+
+            var updateInvoice = new UpdateInvoiceBuilder().Build();
+            updateInvoiceMapperMock.Setup(mapper => mapper.ToModel(invoice)).Returns((updateInvoice));
+
+            testSubject.Request.Headers.Add(HeaderNames.IfMatch, EntityTagHeaderValue.Any.Tag);
+
+            // Act
+            var response = testSubject.Patch(Id, new JsonPatchDocument<UpdateInvoice>());
+
+            // Assert
+            Assert.IsType<NoContentResult>(response);
+        }
+
+        [Fact]
+        public void Patch_should_return_ETag()
+        {
+            // Arrange
+            var invoice = new InvoiceBuilder().Build();
+            invoiceRepositoryMock.Setup(r => r.Get(Id)).Returns(invoice);
+            invoiceRepositoryMock.Setup(r => r.Update(It.IsAny<Domain.Invoice>())).Returns(new Version("2"));
+            var updateInvoice = new UpdateInvoiceBuilder().Build();
+            updateInvoiceMapperMock.Setup(mapper => mapper.ToModel(invoice)).Returns((updateInvoice));
+
+            // Act
+            testSubject.Patch(Id, new JsonPatchDocument<UpdateInvoice>());
+
+            // Assert
+            var headers = testSubject.Response.GetTypedHeaders();
+            Assert.NotNull(headers.ETag);
+        }
+
+        [Fact]
+        public void Patch_should_return_PreconditionFailed_When_Etag_Is_Wrong()
+        {
+            // Arrange
+            var invoice = new InvoiceBuilder().Build();
+
+            invoiceRepositoryMock.Setup(r => r.Get(Id)).Returns(invoice);
+            testSubject.Request.Headers.Add(HeaderNames.IfMatch, $"\"unknown\"");
+
+            var updateInvoice = new UpdateInvoiceBuilder().Build();
+            updateInvoiceMapperMock.Setup(mapper => mapper.ToModel(invoice)).Returns((updateInvoice));
+
+            // Act
+            var response = testSubject.Patch(Id, new JsonPatchDocument<UpdateInvoice>());
+
+            // Assert
+            Assert.Equal((int)HttpStatusCode.PreconditionFailed, ((StatusCodeResult)response).StatusCode);
         }
 
         [Fact]

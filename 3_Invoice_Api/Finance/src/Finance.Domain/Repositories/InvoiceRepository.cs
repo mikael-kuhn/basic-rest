@@ -48,7 +48,7 @@ namespace Finance.Domain.Repositories
             instance.Version = Guid.NewGuid().ToString();
             invoices[instance.Id] = instance;
 
-            return new Version(instance.Version);
+            return new Version("x");
         }
 
         public Invoice Create(Invoice instance)
