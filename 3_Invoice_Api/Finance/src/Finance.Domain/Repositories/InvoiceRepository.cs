@@ -19,7 +19,6 @@ namespace Finance.Domain.Repositories
 
         public Invoice Get(string id)
         {
-
             if (!invoices.ContainsKey(id))
             {
                 return null;
@@ -48,7 +47,7 @@ namespace Finance.Domain.Repositories
             instance.Version = Guid.NewGuid().ToString();
             invoices[instance.Id] = instance;
 
-            return new Version("x");
+            return new Version(instance.Version);
         }
 
         public Invoice Create(Invoice instance)
