@@ -72,6 +72,9 @@ namespace FinanceApi.Controllers
 
             var createdInvoice = invoiceRepository.Create(updateInvoiceMapper.ToDomain(updateInvoice));
 
+            var responseHeaders = Response.GetTypedHeaders();
+            responseHeaders.ETag = new EntityTagHeaderValue($"\"{createdInvoice.Version}\"");;
+
             return CreatedAtRoute("GetInvoice",
                 new { id = createdInvoice.Id },
                 getInvoiceMapper.ToModel(createdInvoice));
@@ -194,6 +197,18 @@ namespace FinanceApi.Controllers
             {
                 return NotFound();
             }
+
+            var currentVersion = invoiceRepository.GetCurrentVersion(id);
+            var currentETag = new EntityTagHeaderValue($"\"{currentVersion}\"");
+
+            if (IfMatchGivenIfNoneMatch(currentETag))
+            {
+                return StatusCode((int)HttpStatusCode.NotModified);
+            }
+
+            var responseHeaders = Response.GetTypedHeaders();
+            responseHeaders.ETag = currentETag;
+
             return Ok();
         }
     }

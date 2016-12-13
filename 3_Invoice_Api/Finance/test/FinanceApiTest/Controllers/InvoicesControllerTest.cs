@@ -102,7 +102,7 @@ namespace FinanceApiTest.Controllers
         }
 
         [Fact]
-        public void Get_should_have_etag_header()
+        public void Get_should_have_ETag_header()
         {
             // Arrange
             var invoice = new InvoiceBuilder().Build();
@@ -160,6 +160,25 @@ namespace FinanceApiTest.Controllers
 
             // Assert
             Assert.IsType<CreatedAtRouteResult>(response);
+        }
+
+        [Fact]
+        public void Post_should_return_ETag()
+        {
+            // Arrange
+            var invoice = new UpdateInvoiceBuilder().Build();
+            var domainInvoice = new InvoiceBuilder().Build();
+            var getInvoice = new GetInvoiceBuilder().Build();
+
+            invoiceRepositoryMock.Setup(r => r.Create(It.IsAny<Domain.Invoice>())).Returns(domainInvoice);
+            getInvoiceMapperMock.Setup(mapper => mapper.ToModel(domainInvoice)).Returns(getInvoice);
+
+            // Act
+            testSubject.Post(invoice);
+
+            // Assert
+            var headers = testSubject.Response.GetTypedHeaders();
+            Assert.NotNull(headers.ETag);
         }
 
         [Fact]
@@ -468,6 +487,21 @@ namespace FinanceApiTest.Controllers
         }
 
         [Fact]
+        public void HeadForInvoice_should_return_ETag_for_existing_invoice()
+        {
+            // Arrange
+            invoiceRepositoryMock.Setup(r => r.Exists(Id)).Returns(true);
+            invoiceRepositoryMock.Setup(r => r.GetCurrentVersion(Id)).Returns("123");
+
+            // Act
+            testSubject.HeadForInvoice(Id);
+
+            // Assert
+            var headers = testSubject.Response.GetTypedHeaders();
+            Assert.NotNull(headers.ETag);
+        }
+
+        [Fact]
         public void HeadForInvoice_should_return_NotFound_for_nonexisting_invoice()
         {
             // Arrange
@@ -492,5 +526,22 @@ namespace FinanceApiTest.Controllers
             // Assert
             Assert.Equal(testSubject.Response.ContentType, ApiDefinition.ApiMediaType);
         }
+
+        [Fact]
+        public void HeadForInvoice_should_return_NotModified_when_ETag_match_current_version()
+        {
+            // Arrange
+            invoiceRepositoryMock.Setup(r => r.Exists(Id)).Returns(true);
+            invoiceRepositoryMock.Setup(r => r.GetCurrentVersion(Id)).Returns(Guid.Empty.ToString());
+
+            testSubject.Request.Headers.Add(HeaderNames.IfNoneMatch, $"\"{Guid.Empty}\"");
+
+            // Act
+            var response = testSubject.HeadForInvoice(Id) as StatusCodeResult;
+
+            // Assert
+            Assert.Equal((int) HttpStatusCode.NotModified, response.StatusCode);
+        }
+
     }
 }
