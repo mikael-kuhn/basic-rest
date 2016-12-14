@@ -32,6 +32,7 @@ namespace FinanceApi.Controllers
             this.invoiceRepository = invoiceRepository;
             this.getInvoiceMapper = getInvoiceMapper;
             this.updateInvoiceMapper = updateInvoiceMapper;
+            this.getMinimalInvoiceMapper = getMinimalInvoiceMapper;
         }
 
         [HttpGet]
