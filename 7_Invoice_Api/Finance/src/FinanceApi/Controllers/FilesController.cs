@@ -24,6 +24,7 @@ namespace FinanceApi.Controllers
         }
 
         [HttpGet("{id}", Name = "GetFile")]
+        [ResponseCache(CacheProfileName =  "Default")]
         public IActionResult Get(string id)
         {
             var file = fileRepository.Get(id);
